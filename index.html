@@ -992,17 +992,25 @@
 
     // ─── APP ──────────────────────────────────────────────────────────────────
 
+    function lsGet(key, fallback) {
+      try { const v = window.localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+    }
+    function lsSet(key, value) {
+      try { window.localStorage.setItem(key, JSON.stringify(value)); } catch(e) { console.error(e); }
+    }
+
     function App() {
-      const [savedDayList, setSavedDayList] = useLocalStorage('pss-daylist', null);
-      const [legacyLabels]                  = useLocalStorage('pss-labels', {});
-      const [openedIds, setOpenedIds]       = useLocalStorage('pss-opened', []);
-      const [allNotes, setAllNotes]         = useLocalStorage('pss-notes', {});
-      const [folders, setFolders]           = useLocalStorage('pss-folders', []);
+      const [dayList,   setDayListState] = useState(() => { const saved = lsGet('pss-daylist', null); return saved || getDefaultDayList(lsGet('pss-labels', {})); });
+      const [openedIds, setOpenedIds]    = useState(() => lsGet('pss-opened', []));
+      const [allNotes,  setAllNotes]     = useState(() => lsGet('pss-notes',  {}));
+      const [folders,   setFolders]      = useState(() => lsGet('pss-folders', []));
 
-      const [dayList, setDayListState] = useState(() => savedDayList || getDefaultDayList(legacyLabels));
-      const setDayList = (list) => { setDayListState(list); setSavedDayList(list); };
+      const setDayList  = (list)    => { setDayListState(list);                       lsSet('pss-daylist', list); };
+      const saveOpened  = (ids)     => { setOpenedIds(ids);                            lsSet('pss-opened',  ids); };
+      const saveNotes   = (updater) => { setAllNotes(prev => { const next = typeof updater === 'function' ? updater(prev) : updater; lsSet('pss-notes', next); return next; }); };
+      const saveFolders = (updater) => { setFolders(prev  => { const next = typeof updater === 'function' ? updater(prev)  : updater; lsSet('pss-folders', next); return next; }); };
 
-      const [currentId, setCurrentId] = useState(() => (savedDayList || getDefaultDayList(legacyLabels))[0]?.id);
+      const [currentId, setCurrentId] = useState(() => { const dl = lsGet('pss-daylist', null) || getDefaultDayList(lsGet('pss-labels', {})); return dl[0]?.id; });
 
       const openedSet = new Set(openedIds);
 
@@ -1019,14 +1027,14 @@
       const currentIdx = dayList.findIndex(d => d.id === currentId);
       const currentDay = dayList[currentIdx] || dayList[0];
 
-      const handleSelect   = useCallback((id) => setCurrentId(id), []);
-      const handleOpen     = useCallback(() => {
-        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
-      }, [currentId, openedIds, openedSet, setOpenedIds]);
-      const handleSave     = useCallback((notes) => {
-        setAllNotes(prev => ({ ...prev, [currentId]: notes }));
-        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
-      }, [currentId, openedIds, openedSet, setAllNotes, setOpenedIds]);
+      const handleSelect    = useCallback((id) => setCurrentId(id), []);
+      const handleOpen      = useCallback(() => {
+        if (!openedSet.has(currentId)) saveOpened([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet]);
+      const handleSave      = useCallback((notes) => {
+        saveNotes(prev => ({ ...prev, [currentId]: notes }));
+        if (!openedSet.has(currentId)) saveOpened([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet]);
       const handleLabelSave = useCallback((label) => {
         setDayList(dayList.map(d => d.id === currentId ? { ...d, label } : d));
       }, [currentId, dayList]);
@@ -1050,16 +1058,16 @@
         next.splice(to, 0, moved);
         setDayList(next);
       };
-      const handleAddNewDay    = (data) => {
+      const handleAddNewDay = (data) => {
         const newDay = { ...data, id: 'c-' + Date.now() };
         setDayList([...dayList, newDay]);
       };
 
       // Folder CRUD
-      const handleAddFolder    = (name) => setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, dayIds: [] }]);
-      const handleDeleteFolder = (fid)  => setFolders(prev => prev.filter(f => f.id !== fid));
-      const handleAddDay       = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: [...(f.dayIds||[]).filter(d=>d!==dayId), dayId] } : f));
-      const handleRemoveDay    = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: (f.dayIds||[]).filter(d=>d!==dayId) } : f));
+      const handleAddFolder    = (name)         => saveFolders(prev => [...prev, { id: `f-${Date.now()}`, name, dayIds: [] }]);
+      const handleDeleteFolder = (fid)           => saveFolders(prev => prev.filter(f => f.id !== fid));
+      const handleAddDay       = (fid, dayId)    => saveFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: [...(f.dayIds||[]).filter(d=>d!==dayId), dayId] } : f));
+      const handleRemoveDay    = (fid, dayId)    => saveFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: (f.dayIds||[]).filter(d=>d!==dayId) } : f));
 
       const notes  = allNotes[currentId] || blankNotes();
       const isOpen = openedSet.has(currentId);
