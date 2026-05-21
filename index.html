@@ -811,11 +811,14 @@
       const [labelDraft, setLabelDraft] = useState(groupLabel);
       const [savedFlash, setSavedFlash] = useState(false);
 
+      // Keep ref always pointing at latest form so auto-save on unmount gets current data
+      const formRef = useRef(form);
+      useEffect(() => { formRef.current = form; }, [form]);
+
+      // Auto-save when this component unmounts (i.e. user switches day)
       useEffect(() => {
-        setForm(notes);
-        setLabelDraft(day.label);
-        setEditingLabel(false);
-      }, [day.id, notes]);
+        return () => { onSave(formRef.current); };
+      }, []); // eslint-disable-line
 
       const update = (field, value) => setForm(f => ({ ...f, [field]: value }));
       const updateQA = (i, key, val) => update('qa', form.qa.map((p, idx) => idx === i ? { ...p, [key]: val } : p));
@@ -1000,17 +1003,16 @@
     }
 
     function App() {
-      const [dayList,   setDayListState] = useState(() => { const saved = lsGet('pss-daylist', null); return saved || getDefaultDayList(lsGet('pss-labels', {})); });
-      const [openedIds, setOpenedIds]    = useState(() => lsGet('pss-opened', []));
-      const [allNotes,  setAllNotes]     = useState(() => lsGet('pss-notes',  {}));
-      const [folders,   setFolders]      = useState(() => lsGet('pss-folders', []));
+      const [dayList,      setDayListState]   = useState(() => lsGet('pss-daylist', null) || getDefaultDayList(lsGet('pss-labels', {})));
+      const [openedIds,    setOpenedIdsState]  = useState(() => lsGet('pss-opened',  []));
+      const [allNotes,     setAllNotesState]   = useState(() => lsGet('pss-notes',   {}));
+      const [folders,      setFoldersState]    = useState(() => lsGet('pss-folders', []));
+      const [currentId,    setCurrentId]       = useState(() => { const dl = lsGet('pss-daylist', null) || getDefaultDayList(lsGet('pss-labels', {})); return dl[0]?.id; });
 
-      const setDayList  = (list)    => { setDayListState(list);                       lsSet('pss-daylist', list); };
-      const saveOpened  = (ids)     => { setOpenedIds(ids);                            lsSet('pss-opened',  ids); };
-      const saveNotes   = (updater) => { setAllNotes(prev => { const next = typeof updater === 'function' ? updater(prev) : updater; lsSet('pss-notes', next); return next; }); };
-      const saveFolders = (updater) => { setFolders(prev  => { const next = typeof updater === 'function' ? updater(prev)  : updater; lsSet('pss-folders', next); return next; }); };
-
-      const [currentId, setCurrentId] = useState(() => { const dl = lsGet('pss-daylist', null) || getDefaultDayList(lsGet('pss-labels', {})); return dl[0]?.id; });
+      const setDayList   = (list)    => { setDayListState(list);   lsSet('pss-daylist', list); };
+      const setOpenedIds = (ids)     => { setOpenedIdsState(ids);  lsSet('pss-opened',  ids);  };
+      const setAllNotes  = (updater) => { setAllNotesState(prev  => { const next = typeof updater === 'function' ? updater(prev) : updater; lsSet('pss-notes',   next); return next; }); };
+      const setFolders   = (updater) => { setFoldersState(prev   => { const next = typeof updater === 'function' ? updater(prev) : updater; lsSet('pss-folders', next); return next; }); };
 
       const openedSet = new Set(openedIds);
 
@@ -1027,14 +1029,14 @@
       const currentIdx = dayList.findIndex(d => d.id === currentId);
       const currentDay = dayList[currentIdx] || dayList[0];
 
-      const handleSelect    = useCallback((id) => setCurrentId(id), []);
-      const handleOpen      = useCallback(() => {
-        if (!openedSet.has(currentId)) saveOpened([...openedIds, currentId]);
-      }, [currentId, openedIds, openedSet]);
-      const handleSave      = useCallback((notes) => {
-        saveNotes(prev => ({ ...prev, [currentId]: notes }));
-        if (!openedSet.has(currentId)) saveOpened([...openedIds, currentId]);
-      }, [currentId, openedIds, openedSet]);
+      const handleSelect   = useCallback((id) => setCurrentId(id), []);
+      const handleOpen     = useCallback(() => {
+        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet, setOpenedIds]);
+      const handleSave     = useCallback((notes) => {
+        setAllNotes(prev => ({ ...prev, [currentId]: notes }));
+        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet, setAllNotes, setOpenedIds]);
       const handleLabelSave = useCallback((label) => {
         setDayList(dayList.map(d => d.id === currentId ? { ...d, label } : d));
       }, [currentId, dayList]);
@@ -1058,16 +1060,16 @@
         next.splice(to, 0, moved);
         setDayList(next);
       };
-      const handleAddNewDay = (data) => {
+      const handleAddNewDay    = (data) => {
         const newDay = { ...data, id: 'c-' + Date.now() };
         setDayList([...dayList, newDay]);
       };
 
       // Folder CRUD
-      const handleAddFolder    = (name)         => saveFolders(prev => [...prev, { id: `f-${Date.now()}`, name, dayIds: [] }]);
-      const handleDeleteFolder = (fid)           => saveFolders(prev => prev.filter(f => f.id !== fid));
-      const handleAddDay       = (fid, dayId)    => saveFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: [...(f.dayIds||[]).filter(d=>d!==dayId), dayId] } : f));
-      const handleRemoveDay    = (fid, dayId)    => saveFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: (f.dayIds||[]).filter(d=>d!==dayId) } : f));
+      const handleAddFolder    = (name) => setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, dayIds: [] }]);
+      const handleDeleteFolder = (fid)  => setFolders(prev => prev.filter(f => f.id !== fid));
+      const handleAddDay       = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: [...(f.dayIds||[]).filter(d=>d!==dayId), dayId] } : f));
+      const handleRemoveDay    = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: (f.dayIds||[]).filter(d=>d!==dayId) } : f));
 
       const notes  = allNotes[currentId] || blankNotes();
       const isOpen = openedSet.has(currentId);
@@ -1093,6 +1095,7 @@
           <main className="app-main">
             {isOpen ? (
               <StudyPage
+                key={currentDay?.id}
                 day={currentDay}
                 notes={notes}
                 onSave={handleSave}
