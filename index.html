@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proverbs on Speech — 95-Day Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; overflow: hidden; }
+    body { background: #fefcf8; color: #2c2a22; -webkit-font-smoothing: antialiased; font-size: 15px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd9ce; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #c9b898; }
+
+    /* Shell */
+    .app-shell { display: flex; height: 100vh; overflow: hidden; }
+    .app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 240px; min-width: 240px; height: 100vh; display: flex; flex-direction: column; border-right: 1px solid #e5e3da; background: #f9f7f2; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; }
+    .sidebar-header { padding: 20px 16px 14px; border-bottom: 1px solid #e5e3da; }
+    .sidebar-title { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #2c2a22; font-family: 'Lora', Georgia, serif; }
+    .sidebar-sub { font-size: 11px; color: #8a8577; margin-top: 3px; }
+    .sidebar-search { padding: 10px 12px; border-bottom: 1px solid #e5e3da; }
+    .sidebar-search input { width: 100%; font-size: 12px; padding: 6px 10px; border: 1px solid #ddd9ce; border-radius: 6px; background: #fff; color: #2c2a22; font-family: 'Inter', system-ui, sans-serif; outline: none; }
+    .sidebar-search input:focus { border-color: #8b6c42; }
+    .day-list { flex: 1; overflow-y: auto; padding: 6px 0; list-style: none; margin: 0; min-height: 0; }
+    .day-item { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px 9px 16px; cursor: pointer; border-left: 3px solid transparent; transition: background 0.12s; }
+    .day-item:hover { background: #f0ede4; }
+    .day-item.active { background: #fff; border-left-color: #8b6c42; }
+    .day-item.done .day-label { color: #8a8577; }
+    .day-label { font-size: 13px; color: #2c2a22; font-weight: 500; flex: 1; }
+    .day-meta { display: flex; align-items: center; gap: 4px; }
+    .badge { font-size: 11px; border-radius: 10px; padding: 1px 6px; }
+    .badge-done { color: #4a7c59; background: #e8f5ed; font-size: 10px; }
+    .badge-lock { font-size: 12px; opacity: 0.35; }
+    .badge-open { color: #8b6c42; font-size: 18px; line-height: 1; }
+    .sidebar-progress { padding: 10px 16px; border-top: 1px solid #e5e3da; }
+    .prog-label { font-size: 11px; color: #8a8577; margin-bottom: 5px; }
+    .prog-track { height: 3px; background: #ddd9ce; border-radius: 2px; }
+    .prog-fill { height: 3px; background: #8b6c42; border-radius: 2px; transition: width 0.4s ease; }
+
+    /* ── Folders section ── */
+    .folder-section { border-top: 1px solid #e5e3da; overflow-y: auto; max-height: 45%; padding-bottom: 6px; }
+    .folder-section-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 6px 16px; position: sticky; top: 0; background: #f9f7f2; z-index: 1; }
+    .folder-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a8577; }
+    .folder-add-btn { font-size: 18px; line-height: 1; color: #8b6c42; background: none; border: none; cursor: pointer; padding: 0 2px; font-weight: 300; }
+    .folder-add-btn:hover { color: #70562f; }
+    .folder-new-row { display: flex; gap: 6px; padding: 0 12px 8px; }
+    .folder-new-input { flex: 1; font-size: 12px; padding: 5px 8px; border: 1px solid #ddd9ce; border-radius: 6px; background: #fff; color: #2c2a22; font-family: 'Inter', system-ui, sans-serif; outline: none; }
+    .folder-new-input:focus { border-color: #8b6c42; }
+    .folder-new-confirm { font-size: 14px; color: #4a7c59; background: none; border: none; cursor: pointer; padding: 0 4px; }
+    .folder-empty { font-size: 11px; color: #b0a898; padding: 4px 16px 8px; font-style: italic; }
+    .folder-item { }
+    .folder-header { display: flex; align-items: center; gap: 5px; padding: 7px 12px 7px 14px; cursor: pointer; transition: background 0.12s; }
+    .folder-header:hover { background: #f0ede4; }
+    .folder-chevron { font-size: 9px; color: #8a8577; width: 12px; flex-shrink: 0; }
+    .folder-icon { font-size: 13px; flex-shrink: 0; }
+    .folder-name { flex: 1; font-size: 13px; color: #2c2a22; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .folder-count { font-size: 10px; color: #b0a898; flex-shrink: 0; }
+    .folder-delete-btn { font-size: 10px; color: #c9b898; background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+    .folder-header:hover .folder-delete-btn { opacity: 1; }
+    .folder-delete-btn:hover { color: #c0503a; }
+    .folder-days { padding: 0 0 4px 28px; }
+    .folder-day-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px 5px 6px; border-radius: 4px; cursor: pointer; }
+    .folder-day-row:hover { background: #f0ede4; }
+    .folder-day-row.active .folder-day-name { color: #8b6c42; font-weight: 600; }
+    .folder-day-name { font-size: 12px; color: #5a5445; flex: 1; }
+    .folder-day-remove { font-size: 9px; color: #c9b898; background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0; }
+    .folder-day-row:hover .folder-day-remove { opacity: 1; }
+    .folder-day-remove:hover { color: #c0503a; }
+    .folder-add-day-btn { font-size: 11px; color: #8b6c42; background: none; border: 1px dashed #c9b898; border-radius: 4px; padding: 3px 8px; cursor: pointer; margin: 4px 0 2px 6px; }
+    .folder-add-day-btn:hover { background: #f5ede0; }
+    .folder-add-day-row { display: flex; gap: 4px; align-items: center; padding: 3px 0 3px 6px; }
+    .folder-day-select { font-size: 11px; padding: 3px 5px; border: 1px solid #ddd9ce; border-radius: 5px; background: #fff; color: #2c2a22; outline: none; max-width: 130px; }
+    .folder-add-day-cancel { font-size: 10px; color: #b0a898; background: none; border: none; cursor: pointer; padding: 2px 4px; }
+
+    /* ── Welcome ── */
+    .welcome-screen { flex: 1; display: flex; align-items: center; justify-content: center; background: #fefcf8; padding: 40px; }
+    .welcome-card { text-align: center; max-width: 380px; }
+    .welcome-lock { font-size: 44px; margin-bottom: 22px; opacity: 0.45; }
+    .welcome-title { font-family: 'Lora', Georgia, serif; font-size: 30px; font-weight: 700; color: #2c2a22; margin-bottom: 14px; }
+    .welcome-text { font-size: 16px; color: #8a8577; line-height: 1.7; margin-bottom: 32px; }
+    .welcome-btn { font-size: 15px; font-weight: 600; padding: 13px 36px; background: #8b6c42; color: #fff; border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.02em; transition: background 0.15s; }
+    .welcome-btn:hover { background: #70562f; }
+
+    /* ── Study page ── */
+    .study-page { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #fefcf8; }
+    .topbar { padding: 18px 40px 14px; border-bottom: 1px solid #e5e3da; background: #fefcf8; flex-shrink: 0; display: flex; justify-content: center; }
+    .topbar-inner { width: 100%; max-width: 740px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .topbar-left { flex: 1; min-width: 0; }
+    .day-heading { font-family: 'Lora', Georgia, serif; font-size: 22px; font-weight: 700; color: #2c2a22; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .edit-hint { font-size: 11px; color: #8b6c42; font-family: 'Inter', system-ui, sans-serif; font-weight: 500; font-style: normal; opacity: 0.65; background: #efe8d8; border-radius: 4px; padding: 2px 6px; transition: opacity 0.15s; }
+    .day-heading:hover .edit-hint { opacity: 1; }
+    .label-edit { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .label-input { font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 700; color: #2c2a22; border: none; border-bottom: 2px solid #8b6c42; background: transparent; outline: none; padding: 2px 4px; min-width: 200px; }
+    .label-save-btn { font-size: 12px; padding: 5px 12px; background: #8b6c42; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    .label-cancel-btn { font-size: 12px; padding: 5px 12px; background: transparent; color: #8a8577; border: 1px solid #ddd9ce; border-radius: 5px; cursor: pointer; }
+    .verse-refs-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .verse-ref-chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #f0ede4; color: #5a5445; font-weight: 600; letter-spacing: 0.03em; }
+    .theme-chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #efe8d8; color: #8b6c42; font-weight: 500; }
+    .topbar-nav { display: flex; gap: 6px; flex-shrink: 0; padding-top: 4px; }
+    .nav-btn { font-size: 13px; padding: 8px 16px; border: 1px solid #ddd9ce; border-radius: 6px; background: transparent; color: #5a5445; cursor: pointer; font-family: 'Inter', system-ui, sans-serif; transition: background 0.12s; }
+    .nav-btn:hover:not(:disabled) { background: #f0ede4; }
+    .nav-btn:disabled { opacity: 0.35; cursor: default; }
+
+    /* Study body — centred column, shifted left */
+    .study-body { flex: 1; overflow-y: auto; padding: 18px 32px 36px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(to right, #ede8dc 0px, #fefcf8 72px, #fefcf8 calc(100% - 72px), #ede8dc 100%); }
+    .study-content { max-width: 740px; width: 100%; transform: translateX(-60px); }
+    .topbar-inner { transform: translateX(-60px); }
+    .topbar { padding: 12px 32px 10px; }
+    .topbar-left { flex: 1; min-width: 0; text-align: left; }
+    .day-heading { margin-bottom: 4px; }
+
+    /* ── Sidebar manage mode ── */
+    .sidebar-header-row { display: flex; align-items: flex-start; justify-content: space-between; }
+    .manage-toggle { font-size: 11px; font-weight: 600; color: #8b6c42; background: none; border: 1px solid #c9b898; border-radius: 4px; padding: 3px 7px; cursor: pointer; white-space: nowrap; margin-top: 2px; }
+    .manage-toggle.active { background: #8b6c42; color: #fff; border-color: #8b6c42; }
+    .day-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .day-action-btn { font-size: 11px; color: #b0a898; background: none; border: none; cursor: pointer; padding: 2px 5px; border-radius: 3px; line-height: 1; }
+    .day-action-btn:hover { color: #2c2a22; background: #e5e3da; }
+    .day-action-btn.del:hover { color: #c0503a; background: #fdf0ed; }
+    /* Drag reorder */
+    .day-item { cursor: grab; }
+    .day-item.drag-over { background: #efe8d8 !important; border-left-color: #8b6c42 !important; }
+    .day-item.dragging { opacity: 0.4; }
+    /* Color dot */
+    .day-color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .color-swatch-btn { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #c9b898; cursor: pointer; flex-shrink: 0; }
+    .color-swatch-btn:hover { box-shadow: 0 0 0 1px #8b6c42; }
+    .color-picker-strip { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 14px 10px; background: #f0ede4; border-left: 3px solid #c9b898; }
+    .color-swatch { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+    .color-swatch:hover { border-color: #5a5445; }
+    .color-swatch.selected { border-color: #2c2a22; box-shadow: 0 0 0 1px #2c2a22; }
+    .color-swatch.clr { background: #fefcf8; border: 1px dashed #c9b898 !important; }
+    .day-edit-form { background: #f0ede4; border-left: 3px solid #8b6c42; padding: 10px 12px 12px; margin: 0 0 2px; }
+    .day-edit-form label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8a8577; margin-bottom: 3px; margin-top: 8px; }
+    .day-edit-form label:first-of-type { margin-top: 0; }
+    .day-edit-form input, .day-edit-form textarea { width: 100%; font-size: 11px; padding: 5px 7px; border: 1px solid #ddd9ce; border-radius: 5px; background: #fff; color: #2c2a22; font-family: 'Inter', system-ui, sans-serif; outline: none; resize: vertical; line-height: 1.5; }
+    .day-edit-form input:focus, .day-edit-form textarea:focus { border-color: #8b6c42; }
+    .day-edit-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .day-edit-save { font-size: 11px; font-weight: 600; padding: 5px 12px; background: #8b6c42; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    .day-edit-cancel { font-size: 11px; padding: 5px 10px; background: transparent; color: #8a8577; border: 1px solid #ddd9ce; border-radius: 5px; cursor: pointer; }
+    .add-verse-btn { display: block; width: calc(100% - 24px); margin: 6px 12px 8px; font-size: 12px; font-weight: 600; color: #8b6c42; background: none; border: 1px dashed #c9b898; border-radius: 6px; padding: 7px 0; cursor: pointer; text-align: center; }
+    .add-verse-btn:hover { background: #f5ede0; }
+    .add-verse-form { background: #fefcf8; border-top: 1px solid #e5e3da; padding: 12px; }
+
+    /* Verse blocks — STACKED, same background, distinct text styles */
+    .verse-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .verse-block { border-radius: 10px; padding: 16px 20px; border: 1px solid #e5e3da; background: #fefcf8; }
+    .kjv-block { border-left: 3px solid #b8a882; background: #f7f3e8; }
+    .alt-block { border-left: 3px solid #8b6c42; }
+    .verse-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .trans-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a8577; }
+    .trans-label-row { display: flex; align-items: center; gap: 8px; }
+    .trans-select { font-size: 12px; padding: 3px 7px; border: 1px solid #ddd9ce; border-radius: 5px; background: #fff; color: #5a5445; cursor: pointer; outline: none; }
+    /* KJV: classic italic serif */
+    .verse-text { font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.85; color: #2c2a22; margin: 0; font-style: italic; outline: none; }
+    .verse-text.alt-text { font-style: normal; color: #4a4635; font-size: 16px; }
+    /* Bold button on verse blocks */
+    .verse-bold-btn { font-size: 11px; font-weight: 700; font-family: 'Inter', system-ui, sans-serif; color: #8a8577; background: #f0ede4; border: 1px solid #ddd9ce; border-radius: 4px; padding: 2px 7px; cursor: pointer; flex-shrink: 0; letter-spacing: 0.03em; }
+    .verse-bold-btn:hover { background: #efe8d8; color: #8b6c42; border-color: #c9b898; }
+
+    .divider { height: 1px; background: #e5e3da; margin: 18px 0; }
+
+    /* Field sections */
+    .field-section { margin-bottom: 20px; }
+    .caption-section { margin-bottom: 32px; }
+    .field-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #5a5445; margin-bottom: 10px; font-family: 'Inter', system-ui, sans-serif; }
+    .field-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #efe8d8; color: #8b6c42; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .field-textarea { width: 100%; font-size: 15px; padding: 12px 14px; border: 1px solid #ddd9ce; border-radius: 8px; background: #fff; color: #2c2a22; resize: vertical; font-family: 'Inter', system-ui, sans-serif; line-height: 1.7; outline: none; transition: border-color 0.15s; min-height: 90px; }
+    .field-textarea:focus { border-color: #8b6c42; }
+    .qa-pair { display: flex; gap: 14px; margin-bottom: 10px; align-items: flex-start; }
+    .qa-col { flex: 1; min-width: 0; }
+    .qa-sub-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #8a8577; margin-bottom: 5px; font-family: 'Inter', system-ui, sans-serif; }
+    .qa-ta { min-height: 90px; }
+    .xref-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+    .xref-input { flex: 1; font-size: 15px; padding: 10px 14px; border: 1px solid #ddd9ce; border-radius: 8px; background: #fff; color: #2c2a22; font-family: 'Inter', system-ui, sans-serif; outline: none; resize: vertical; min-height: 44px; line-height: 1.6; }
+    .xref-input:focus { border-color: #8b6c42; }
+    .add-btn { font-size: 13px; color: #8b6c42; background: none; border: 1px dashed #c9b898; border-radius: 6px; padding: 6px 14px; cursor: pointer; margin-top: 4px; font-family: 'Inter', system-ui, sans-serif; transition: background 0.12s; }
+    .add-btn:hover { background: #f5ede0; }
+    .remove-btn { font-size: 12px; color: #b0a898; background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; margin-top: 22px; line-height: 1; }
+    .remove-btn.small { margin-top: 0; }
+    .remove-btn:hover { color: #c0503a; background: #fdf0ed; }
+    /* Editable bold fields */
+    .bold-field-wrap { position: relative; }
+    .field-editable { width: 100%; font-size: 15px; padding: 12px 14px 30px 14px; border: 1px solid #ddd9ce; border-radius: 8px; background: #fff; color: #2c2a22; font-family: 'Inter', system-ui, sans-serif; line-height: 1.7; outline: none; min-height: 90px; transition: border-color 0.15s; word-break: break-word; display: block; }
+    .field-editable:focus { border-color: #8b6c42; }
+    .field-editable.xref-editable { min-height: 44px; padding-bottom: 28px; }
+    .field-editable:empty::before { content: attr(data-placeholder); color: #b0a898; pointer-events: none; }
+    .field-bold-btn { position: absolute; bottom: 7px; right: 9px; font-size: 11px; font-weight: 700; font-family: 'Inter', system-ui, sans-serif; color: #8a8577; background: #f0ede4; border: 1px solid #ddd9ce; border-radius: 4px; padding: 2px 7px; cursor: pointer; }
+    .field-bold-btn:hover { background: #efe8d8; color: #8b6c42; border-color: #c9b898; }
+    .save-row { margin-top: 36px; display: flex; justify-content: flex-end; }
+    .save-btn { font-size: 14px; font-weight: 600; padding: 12px 34px; background: #8b6c42; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter', system-ui, sans-serif; letter-spacing: 0.02em; transition: background 0.15s; }
+    .save-btn:hover { background: #70562f; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // ─── DATA ────────────────────────────────────────────────────────────────
+
+    const VERSES = [
+      { ref: "Prov 10:6",  theme: "Righteous speech",      kjv: "Blessings are upon the head of the just: but violence covereth the mouth of the wicked.", nlt: "The godly are showered with blessings; the words of the wicked conceal violent intentions." },
+      { ref: "Prov 10:8",  theme: "Wisdom & folly",        kjv: "The wise in heart will receive commandments: but a prating fool shall fall.", nlt: "The wise are glad to be instructed, but babbling fools fall flat on their faces." },
+      { ref: "Prov 10:11", theme: "Life-giving words",     kjv: "The mouth of a righteous man is a well of life: but violence covereth the mouth of the wicked.", nlt: "The words of the godly are a life-giving fountain; the words of the wicked conceal violent intentions." },
+      { ref: "Prov 10:13", theme: "Wisdom & folly",        kjv: "In the lips of him that hath understanding wisdom is found: but a rod is for the back of him that is void of understanding.", nlt: "Wise words come from the lips of people with understanding, but those lacking sense will be beaten with a rod." },
+      { ref: "Prov 10:14", theme: "Wisdom & folly",        kjv: "Wise men lay up knowledge: but the mouth of the foolish is near destruction.", nlt: "Wise people treasure knowledge, but the babbling of a fool invites disaster." },
+      { ref: "Prov 10:18", theme: "Honesty & lying",       kjv: "He that hideth hatred with lying lips, and he that uttereth a slander, is a fool.", nlt: "Hiding hatred makes you a liar; slandering others makes you a fool." },
+      { ref: "Prov 10:19", theme: "Restraint in speech",   kjv: "In the multitude of words there wanteth not sin: but he that refraineth his lips is wise.", nlt: "Too much talk leads to sin. Be sensible and keep your mouth shut." },
+      { ref: "Prov 10:20", theme: "Righteous speech",      kjv: "The tongue of the just is as choice silver: the heart of the wicked is little worth.", nlt: "The words of the godly are like sterling silver; the heart of a fool is worthless." },
+      { ref: "Prov 10:21", theme: "Life-giving words",     kjv: "The lips of the righteous feed many: but fools die for want of wisdom.", nlt: "The words of the godly encourage many, but fools are destroyed by their lack of common sense." },
+      { ref: "Prov 10:31", theme: "Wisdom & folly",        kjv: "The mouth of the just bringeth forth wisdom: but the froward tongue shall be cut out.", nlt: "The mouth of the godly person gives wise advice, but the tongue that deceives will be cut off." },
+      { ref: "Prov 10:32", theme: "Righteous speech",      kjv: "The lips of the righteous know what is acceptable: but the mouth of the wicked speaketh frowardness.", nlt: "The lips of the godly speak helpful words, but the mouth of the wicked speaks perverse words." },
+      { ref: "Prov 11:9",  theme: "Harm & help",           kjv: "An hypocrite with his mouth destroyeth his neighbour: but through knowledge shall the just be delivered.", nlt: "With their words, the godless destroy their friends, but knowledge will rescue the righteous." },
+      { ref: "Prov 11:11", theme: "Community impact",      kjv: "By the blessing of the upright the city is exalted: but it is overthrown by the mouth of the wicked.", nlt: "Upright citizens are good for a city and make it prosper, but the talk of the wicked tears it apart." },
+      { ref: "Prov 11:12", theme: "Restraint in speech",   kjv: "He that is void of wisdom despiseth his neighbour: but a man of understanding holdeth his peace.", nlt: "It is foolish to belittle one's neighbor; a sensible person keeps quiet." },
+      { ref: "Prov 11:13", theme: "Gossip & trust",        kjv: "A talebearer revealeth secrets: but he that is of a faithful spirit concealeth the matter.", nlt: "A gossip goes around telling secrets, but those who are trustworthy can keep a confidence." },
+      { ref: "Prov 12:6",  theme: "Honesty & lying",       kjv: "The words of the wicked are to lie in wait for blood: but the mouth of the upright shall deliver them.", nlt: "The words of the wicked are like a murderous ambush, but the words of the godly save lives." },
+      { ref: "Prov 12:13", theme: "Consequences",          kjv: "The wicked is snared by the transgression of his lips: but the just shall come out of trouble.", nlt: "The wicked are trapped by their own words, but the godly escape such trouble." },
+      { ref: "Prov 12:14", theme: "Fruit of speech",       kjv: "A man shall be satisfied with good by the fruit of his mouth: and the recompence of a man's hands shall be rendered unto him.", nlt: "Wise words will win you a good meal, but treacherous people have an appetite for violence." },
+      { ref: "Prov 12:17", theme: "Honesty & lying",       kjv: "An honest witness telleth the truth: but a false witness deceit.", nlt: "An honest witness tells the truth; a false witness tells lies." },
+      { ref: "Prov 12:18", theme: "Healing words",         kjv: "There is that speaketh like the piercings of a sword: but the tongue of the wise is health.", nlt: "Some people make cutting remarks, but the words of the wise bring healing." },
+      { ref: "Prov 12:19", theme: "Honesty & lying",       kjv: "The lip of truth shall be established for ever: but a lying tongue is but for a moment.", nlt: "Truthful words stand the test of time, but lies are soon exposed." },
+      { ref: "Prov 12:22", theme: "Honesty & lying",       kjv: "Lying lips are abomination to the LORD: but they that deal truly are his delight.", nlt: "The LORD detests lying lips, but he delights in those who tell the truth." },
+      { ref: "Prov 13:2",  theme: "Fruit of speech",       kjv: "A man shall eat good by the fruit of his mouth: but the soul of the transgressors shall eat violence.", nlt: "Wise words will win you a good meal, but treacherous people have an appetite for violence." },
+      { ref: "Prov 13:3",  theme: "Restraint in speech",   kjv: "He that keepeth his mouth keepeth his life: but he that openeth wide his lips shall have destruction.", nlt: "Those who control their tongue will have a long life; opening your mouth can ruin everything." },
+      { ref: "Prov 14:3",  theme: "Wisdom & folly",        kjv: "In the mouth of the foolish is a rod of pride: but the lips of the wise shall preserve them.", nlt: "A fool's proud talk becomes a rod that beats him, but the words of the wise keep them safe." },
+      { ref: "Prov 14:5",  theme: "Honesty & lying",       kjv: "A faithful witness will not lie: but a false witness will utter lies.", nlt: "An honest witness does not lie; a false witness breathes lies." },
+      { ref: "Prov 14:7",  theme: "Wisdom & folly",        kjv: "Go from the presence of a foolish man, when thou perceivest not in him the lips of knowledge.", nlt: "Stay away from fools, for you won't find knowledge on their lips." },
+      { ref: "Prov 14:25", theme: "Honesty & lying",       kjv: "A true witness delivereth souls: but a deceitful witness speaketh lies.", nlt: "A truthful witness saves lives, but a false witness is a traitor." },
+      { ref: "Prov 15:1",  theme: "Gentle speech",         kjv: "A soft answer turneth away wrath: but grievous words stir up anger.", nlt: "A gentle answer deflects anger, but harsh words make tempers flare." },
+      { ref: "Prov 15:2",  theme: "Wisdom & folly",        kjv: "The tongue of the wise useth knowledge aright: but the mouth of fools poureth out foolishness.", nlt: "The tongue of the wise makes knowledge appealing, but the mouth of a fool belches out foolishness." },
+      { ref: "Prov 15:4",  theme: "Healing words",         kjv: "A wholesome tongue is a tree of life: but perverseness therein is a breach in the spirit.", nlt: "Gentle words are a tree of life; a deceitful tongue crushes the spirit." },
+      { ref: "Prov 15:7",  theme: "Wisdom & folly",        kjv: "The lips of the wise disperse knowledge: but the heart of the foolish doeth not so.", nlt: "The lips of the wise give good advice; the heart of a fool has none to give." },
+      { ref: "Prov 15:14", theme: "Wisdom & folly",        kjv: "The heart of him that hath understanding seeketh knowledge: but the mouth of fools feedeth on foolishness.", nlt: "A wise person is hungry for knowledge, while the fool feeds on trash." },
+      { ref: "Prov 15:23", theme: "Timely speech",         kjv: "A man hath joy by the answer of his mouth: and a word spoken in due season, how good is it!", nlt: "Everyone enjoys a fitting reply; it is wonderful to say the right thing at the right time!" },
+      { ref: "Prov 15:28", theme: "Thoughtful speech",     kjv: "The heart of the righteous studieth to answer: but the mouth of the wicked poureth out evil things.", nlt: "The heart of the godly thinks carefully before speaking; the mouth of the wicked overflows with evil words." },
+      { ref: "Prov 16:13", theme: "Righteous speech",      kjv: "Righteous lips are the delight of kings; and they love him that speaketh right.", nlt: "The king is pleased with words from righteous lips; he loves those who speak honestly." },
+      { ref: "Prov 16:21", theme: "Persuasive speech",     kjv: "The wise in heart shall be called prudent: and the sweetness of the lips increaseth learning.", nlt: "The wise are known for their understanding, and pleasant words are persuasive." },
+      { ref: "Prov 16:23", theme: "Thoughtful speech",     kjv: "The heart of the wise teacheth his mouth, and addeth learning to his lips.", nlt: "From a wise mind comes wise speech; the words of the wise are persuasive." },
+      { ref: "Prov 16:24", theme: "Encouraging words",     kjv: "Pleasant words are as an honeycomb, sweet to the soul, and health to the bones.", nlt: "Kind words are like honey — sweet to the soul and healthy for the body." },
+      { ref: "Prov 16:27", theme: "Harm & help",           kjv: "An ungodly man diggeth up evil: and in his lips there is as a burning fire.", nlt: "Scoundrels create trouble; their words are a destructive blaze." },
+      { ref: "Prov 16:28", theme: "Gossip & trust",        kjv: "A froward man soweth strife: and a whisperer separateth chief friends.", nlt: "A troublemaker plants seeds of strife; gossip separates the best of friends." },
+      { ref: "Prov 16:30", theme: "Deceptive speech",      kjv: "He shutteth his eyes to devise froward things: moving his lips he bringeth evil to pass.", nlt: "With narrowed eyes, people plot evil; with a smirk, they plan their mischief." },
+      { ref: "Prov 17:4",  theme: "Deceptive speech",      kjv: "A wicked doer giveth heed to false lips; and a liar giveth ear to a naughty tongue.", nlt: "Wrongdoers eagerly listen to gossip; liars pay close attention to slander." },
+      { ref: "Prov 17:7",  theme: "Fitting speech",        kjv: "Excellent speech becometh not a fool: much less do lying lips a prince.", nlt: "Eloquent words are not fitting for a fool; even less fitting are lies for a ruler." },
+      { ref: "Prov 17:20", theme: "Honesty & lying",       kjv: "He that hath a froward heart findeth no good: and he that hath a perverse tongue falleth into mischief.", nlt: "The crooked heart will not prosper; the lying tongue tumbles into trouble." },
+      { ref: "Prov 17:27", theme: "Restraint in speech",   kjv: "He that hath knowledge spareth his words: and a man of understanding is of an excellent spirit.", nlt: "A truly wise person uses few words; a person with understanding is even-tempered." },
+      { ref: "Prov 17:28", theme: "Restraint in speech",   kjv: "Even a fool, when he holdeth his peace, is counted wise: and he that shutteth his lips is esteemed a man of understanding.", nlt: "Even fools are thought wise when they keep silent; with their mouths shut, they seem intelligent." },
+      { ref: "Prov 18:2",  theme: "Listening vs. speaking",kjv: "A fool hath no delight in understanding, but that his heart may discover itself.", nlt: "Fools have no interest in understanding; they only want to air their own opinions." },
+      { ref: "Prov 18:4",  theme: "Deep speech",           kjv: "The words of a man's mouth are as deep waters, and the wellspring of wisdom as a flowing brook.", nlt: "Wise words are like deep waters; wisdom flows from the wise like a bubbling brook." },
+      { ref: "Prov 18:6",  theme: "Wisdom & folly",        kjv: "A fool's lips enter into contention, and his mouth calleth for strokes.", nlt: "Fools' words get them into constant quarrels; they are asking for a beating." },
+      { ref: "Prov 18:7",  theme: "Consequences",          kjv: "A fool's mouth is his destruction, and his lips are the snare of his soul.", nlt: "The mouths of fools are their ruin; they trap themselves with their lips." },
+      { ref: "Prov 18:8",  theme: "Gossip & trust",        kjv: "The words of a talebearer are as wounds, and they go down into the innermost parts of the belly.", nlt: "Rumors are dainty morsels that sink deep into one's heart." },
+      { ref: "Prov 18:13", theme: "Listening vs. speaking",kjv: "He that answereth a matter before he heareth it, it is folly and shame unto him.", nlt: "Spouting off before listening to the facts is both shameful and foolish." },
+      { ref: "Prov 18:20", theme: "Fruit of speech",       kjv: "A man's belly shall be satisfied with the fruit of his mouth; and with the increase of his lips shall he be filled.", nlt: "Wise words satisfy like a good meal; the right words bring satisfaction." },
+      { ref: "Prov 18:21", theme: "Power of the tongue",   kjv: "Death and life are in the power of the tongue: and they that love it shall eat the fruit thereof.", nlt: "The tongue can bring death or life; those who love to talk will reap the consequences." },
+      { ref: "Prov 18:23", theme: "Tone & manner",         kjv: "The poor useth intreaties; but the rich answereth roughly.", nlt: "The poor plead for mercy; the rich answer with insults." },
+      { ref: "Prov 19:1",  theme: "Honesty & lying",       kjv: "Better is the poor that walketh in his integrity, than he that is perverse in his lips, and is a fool.", nlt: "Better to be poor and honest than to be dishonest and a fool." },
+      { ref: "Prov 19:5",  theme: "Honesty & lying",       kjv: "A false witness shall not be unpunished, and he that speaketh lies shall not escape.", nlt: "A false witness will not go unpunished, nor will a liar escape." },
+      { ref: "Prov 19:9",  theme: "Honesty & lying",       kjv: "A false witness shall not be unpunished, and he that speaketh lies shall perish.", nlt: "A false witness will not go unpunished, and a liar will be destroyed." },
+      { ref: "Prov 19:28", theme: "Honesty & lying",       kjv: "An ungodly witness scorneth judgment: and the mouth of the wicked devoureth iniquity.", nlt: "A corrupt witness makes a mockery of justice; the mouth of the wicked gulps down evil." },
+      { ref: "Prov 20:19", theme: "Gossip & trust",        kjv: "He that goeth about as a talebearer revealeth secrets: therefore meddle not with him that flattereth with his lips.", nlt: "A gossip goes around telling secrets, so don't hang around with chatterers." },
+      { ref: "Prov 20:25", theme: "Rash speech",           kjv: "It is a snare to the man who devoureth that which is holy, and after vows to make enquiry.", nlt: "Don't trap yourself by making a rash promise to God and only later counting the cost." },
+      { ref: "Prov 21:6",  theme: "Honesty & lying",       kjv: "The getting of treasures by a lying tongue is a vanity tossed to and fro of them that seek death.", nlt: "Wealth created by a lying tongue is a vanishing mist and a deadly trap." },
+      { ref: "Prov 21:23", theme: "Restraint in speech",   kjv: "Whoso keepeth his mouth and his tongue keepeth his soul from troubles.", nlt: "Watch your tongue and keep your mouth shut, and you will stay out of trouble." },
+      { ref: "Prov 21:28", theme: "Honesty & lying",       kjv: "A false witness shall perish: but the man that heareth speaketh constantly.", nlt: "A false witness will be cut off, but a credible witness will be allowed to speak." },
+      { ref: "Prov 22:11", theme: "Gracious speech",       kjv: "He that loveth pureness of heart, for the grace of his lips the king shall be his friend.", nlt: "Whoever loves a pure heart and gracious speech will have the king as a friend." },
+      { ref: "Prov 22:14", theme: "Deceptive speech",      kjv: "The mouth of strange women is a deep pit: he that is abhorred of the LORD shall fall therein.", nlt: "The mouth of an immoral woman is a dangerous trap; those who make the LORD angry will fall into it." },
+      { ref: "Prov 23:9",  theme: "Fitting speech",        kjv: "Speak not in the ears of a fool: for he will despise the wisdom of thy words.", nlt: "Don't waste your breath on fools, for they will despise the wisest advice." },
+      { ref: "Prov 23:16", theme: "Righteous speech",      kjv: "Yea, my reins shall rejoice, when thy lips speak right things.", nlt: "I will be filled with joy when you speak what is right." },
+      { ref: "Prov 24:1",  theme: "Harm & help",           kjv: "Be not thou envious against evil men, neither desire to be with them. For their heart studieth destruction, and their lips talk of mischief.", nlt: "Don't envy evil people or desire their company. For their hearts plot violence, and their words always stir up trouble." },
+      { ref: "Prov 24:24", theme: "Righteous speech",      kjv: "He that saith unto the wicked, Thou art righteous; him shall the people curse, nations shall abhor him.", nlt: "If you say to the wicked, 'You are innocent,' the nations will curse you and people will despise you." },
+      { ref: "Prov 24:25", theme: "Honest rebuke",         kjv: "But to them that rebuke him shall be delight, and a good blessing shall come upon them.", nlt: "But it will go well for those who convict the guilty; rich blessings will be showered on them." },
+      { ref: "Prov 24:26", theme: "Honest speech",         kjv: "Every man shall kiss his lips that giveth a right answer.", nlt: "An honest answer is like a kiss of friendship." },
+      { ref: "Prov 24:28", theme: "Honesty & lying",       kjv: "Be not a witness against thy neighbour without cause; and deceive not with thy lips.", nlt: "Don't testify against your neighbors without cause; don't lie about them." },
+      { ref: "Prov 25:9",  theme: "Conflict & speech",     kjv: "Debate thy cause with thy neighbour himself; and discover not a secret to another.", nlt: "When arguing with your neighbor, don't betray another person's secret." },
+      { ref: "Prov 25:11", theme: "Timely speech",         kjv: "A word fitly spoken is like apples of gold in pictures of silver.", nlt: "Timely advice is lovely, like golden apples in a silver basket." },
+      { ref: "Prov 25:15", theme: "Gentle speech",         kjv: "By long forbearing is a prince persuaded, and a soft tongue breaketh the bone.", nlt: "Patience can persuade a prince, and soft speech can break bones." },
+      { ref: "Prov 25:18", theme: "Honesty & lying",       kjv: "A man that beareth false witness against his neighbour is a maul, and a sword, and a sharp arrow.", nlt: "Telling lies about others is as harmful as hitting them with an ax, wounding them with a sword, or shooting them with a sharp arrow." },
+      { ref: "Prov 25:23", theme: "Gossip & trust",        kjv: "The north wind driveth away rain: so doth an angry countenance a backbiting tongue.", nlt: "As surely as a north wind brings rain, so a gossiping tongue causes anger!" },
+      { ref: "Prov 26:9",  theme: "Wisdom & folly",        kjv: "As a thorn goeth up into the hand of a drunkard, so is a parable in the mouth of fools.", nlt: "A proverb in the mouth of a fool is as dangerous as a thornbush brandished by a drunkard." },
+      { ref: "Prov 26:20", theme: "Gossip & trust",        kjv: "Where no wood is, there the fire goeth out: so where there is no talebearer, the strife ceaseth.", nlt: "Fire goes out without wood, and quarrels disappear when gossip stops." },
+      { ref: "Prov 26:22", theme: "Gossip & trust",        kjv: "The words of a talebearer are as wounds, and they go down into the innermost parts of the belly.", nlt: "Rumors are dainty morsels that sink deep into one's heart." },
+      { ref: "Prov 26:23", theme: "Deceptive speech",      kjv: "Burning lips and a wicked heart are like a potsherd covered with silver dross.", nlt: "Smooth words may hide a wicked heart, just as a pretty glaze covers a clay pot." },
+      { ref: "Prov 26:24", theme: "Deceptive speech",      kjv: "He that hateth dissembleth with his lips, and layeth up deceit within him.", nlt: "People may cover their hatred with pleasant words, but they're deceiving you." },
+      { ref: "Prov 26:25", theme: "Deceptive speech",      kjv: "When he speaketh fair, believe him not: for there are seven abominations in his heart.", nlt: "When someone speaks kindly, don't believe them, for their hearts are full of all kinds of evil." },
+      { ref: "Prov 26:28", theme: "Honesty & lying",       kjv: "A lying tongue hateth those that are afflicted by it; and a flattering mouth worketh ruin.", nlt: "A lying tongue hates its victims, and flattering words cause ruin." },
+      { ref: "Prov 27:2",  theme: "Humility in speech",    kjv: "Let another man praise thee, and not thine own mouth; a stranger, and not thine own lips.", nlt: "Let someone else praise you, not your own mouth — a stranger, not your own lips." },
+      { ref: "Prov 27:5",  theme: "Honest rebuke",         kjv: "Open rebuke is better than secret love.", nlt: "An open rebuke is better than hidden love!" },
+      { ref: "Prov 28:23", theme: "Honest rebuke",         kjv: "He that rebuketh a man afterwards shall find more favour than he that flattereth with the tongue.", nlt: "In the end, people appreciate honest criticism far more than flattery." },
+      { ref: "Prov 29:5",  theme: "Flattery",              kjv: "A man that flattereth his neighbour spreadeth a net for his feet.", nlt: "To flatter friends is to lay a trap for their feet." },
+      { ref: "Prov 29:11", theme: "Restraint in speech",   kjv: "A fool uttereth all his mind: but a wise man keepeth it in till afterwards.", nlt: "Fools vent their anger, but the wise quietly hold it back." },
+      { ref: "Prov 29:20", theme: "Rash speech",           kjv: "Seest thou a man that is hasty in his words? there is more hope of a fool than of him.", nlt: "There is more hope for a fool than for someone who speaks without thinking." },
+      { ref: "Prov 31:8",  theme: "Advocacy",              kjv: "Open thy mouth for the dumb in the cause of all such as are appointed to destruction.", nlt: "Speak up for those who cannot speak for themselves; ensure justice for those being crushed." },
+      { ref: "Prov 31:9",  theme: "Advocacy",              kjv: "Open thy mouth, judge righteously, and plead the cause of the poor and needy.", nlt: "Yes, speak up for the poor and helpless, and see that they get justice." },
+      { ref: "Prov 31:26", theme: "Gracious speech",       kjv: "She openeth her mouth with wisdom; and in her tongue is the law of kindness.", nlt: "When she speaks, her words are wise, and she gives instructions with kindness." },
+    ];
+
+    const TRANSLATIONS = ["NLT", "NIV", "ESV", "NKJV", "MSG", "CSB", "NASB"];
+
+    const DEFAULT_GROUPS = [
+      { id: "day-1",  label: "Day 1",  verseRefs: ["Prov 10:6"]  },
+      { id: "day-2",  label: "Day 2",  verseRefs: ["Prov 10:8"]  },
+      { id: "day-3",  label: "Day 3",  verseRefs: ["Prov 10:11"] },
+      { id: "day-4",  label: "Day 4",  verseRefs: ["Prov 10:13"] },
+      { id: "day-5",  label: "Day 5",  verseRefs: ["Prov 10:14"] },
+      { id: "day-6",  label: "Day 6",  verseRefs: ["Prov 10:18"] },
+      { id: "day-7",  label: "Day 7",  verseRefs: ["Prov 10:19"] },
+      { id: "day-8",  label: "Day 8",  verseRefs: ["Prov 10:20"] },
+      { id: "day-9",  label: "Day 9",  verseRefs: ["Prov 10:21"] },
+      { id: "day-10", label: "Day 10", verseRefs: ["Prov 10:31"] },
+      { id: "day-11", label: "Day 11", verseRefs: ["Prov 10:32"] },
+      { id: "day-12", label: "Day 12", verseRefs: ["Prov 11:9"]  },
+      { id: "day-13", label: "Day 13", verseRefs: ["Prov 11:11"] },
+      { id: "day-14", label: "Day 14", verseRefs: ["Prov 11:12"] },
+      { id: "day-15", label: "Day 15", verseRefs: ["Prov 11:13"] },
+      { id: "day-16", label: "Day 16", verseRefs: ["Prov 12:6"]  },
+      { id: "day-17", label: "Day 17", verseRefs: ["Prov 12:13"] },
+      { id: "day-18", label: "Day 18", verseRefs: ["Prov 12:14"] },
+      { id: "day-19", label: "Day 19", verseRefs: ["Prov 12:17"] },
+      { id: "day-20", label: "Day 20", verseRefs: ["Prov 12:18"] },
+      { id: "day-21", label: "Day 21", verseRefs: ["Prov 12:19"] },
+      { id: "day-22", label: "Day 22", verseRefs: ["Prov 12:22"] },
+      { id: "day-23", label: "Day 23", verseRefs: ["Prov 13:2"]  },
+      { id: "day-24", label: "Day 24", verseRefs: ["Prov 13:3"]  },
+      { id: "day-25", label: "Day 25", verseRefs: ["Prov 14:3"]  },
+      { id: "day-26", label: "Day 26", verseRefs: ["Prov 14:5"]  },
+      { id: "day-27", label: "Day 27", verseRefs: ["Prov 14:7"]  },
+      { id: "day-28", label: "Day 28", verseRefs: ["Prov 14:25"] },
+      { id: "day-29", label: "Day 29", verseRefs: ["Prov 15:1"]  },
+      { id: "day-30", label: "Day 30", verseRefs: ["Prov 15:2"]  },
+      { id: "day-31", label: "Day 31", verseRefs: ["Prov 15:4"]  },
+      { id: "day-32", label: "Day 32", verseRefs: ["Prov 15:7"]  },
+      { id: "day-33", label: "Day 33", verseRefs: ["Prov 15:14"] },
+      { id: "day-34", label: "Day 34", verseRefs: ["Prov 15:23"] },
+      { id: "day-35", label: "Day 35", verseRefs: ["Prov 15:28"] },
+      { id: "day-36", label: "Day 36", verseRefs: ["Prov 16:13"] },
+      { id: "day-37", label: "Day 37", verseRefs: ["Prov 16:21"] },
+      { id: "day-38", label: "Day 38", verseRefs: ["Prov 16:23"] },
+      { id: "day-39", label: "Day 39", verseRefs: ["Prov 16:24"] },
+      { id: "day-40", label: "Day 40", verseRefs: ["Prov 16:27"] },
+      { id: "day-41", label: "Day 41", verseRefs: ["Prov 16:28"] },
+      { id: "day-42", label: "Day 42", verseRefs: ["Prov 16:30"] },
+      { id: "day-43", label: "Day 43", verseRefs: ["Prov 17:4"]  },
+      { id: "day-44", label: "Day 44", verseRefs: ["Prov 17:7"]  },
+      { id: "day-45", label: "Day 45", verseRefs: ["Prov 17:20"] },
+      { id: "day-46", label: "Day 46", verseRefs: ["Prov 17:27"] },
+      { id: "day-47", label: "Day 47", verseRefs: ["Prov 17:28"] },
+      { id: "day-48", label: "Day 48", verseRefs: ["Prov 18:2"]  },
+      { id: "day-49", label: "Day 49", verseRefs: ["Prov 18:4"]  },
+      { id: "day-50", label: "Day 50", verseRefs: ["Prov 18:6"]  },
+      { id: "day-51", label: "Day 51", verseRefs: ["Prov 18:7"]  },
+      { id: "day-52", label: "Day 52", verseRefs: ["Prov 18:8"]  },
+      { id: "day-53", label: "Day 53", verseRefs: ["Prov 18:13"] },
+      { id: "day-54", label: "Day 54", verseRefs: ["Prov 18:20"] },
+      { id: "day-55", label: "Day 55", verseRefs: ["Prov 18:21"] },
+      { id: "day-56", label: "Day 56", verseRefs: ["Prov 18:23"] },
+      { id: "day-57", label: "Day 57", verseRefs: ["Prov 19:1"]  },
+      { id: "day-58", label: "Day 58", verseRefs: ["Prov 19:5"]  },
+      { id: "day-59", label: "Day 59", verseRefs: ["Prov 19:9"]  },
+      { id: "day-60", label: "Day 60", verseRefs: ["Prov 19:28"] },
+      { id: "day-61", label: "Day 61", verseRefs: ["Prov 20:19"] },
+      { id: "day-62", label: "Day 62", verseRefs: ["Prov 20:25"] },
+      { id: "day-63", label: "Day 63", verseRefs: ["Prov 21:6"]  },
+      { id: "day-64", label: "Day 64", verseRefs: ["Prov 21:23"] },
+      { id: "day-65", label: "Day 65", verseRefs: ["Prov 21:28"] },
+      { id: "day-66", label: "Day 66", verseRefs: ["Prov 22:11"] },
+      { id: "day-67", label: "Day 67", verseRefs: ["Prov 22:14"] },
+      { id: "day-68", label: "Day 68", verseRefs: ["Prov 23:9"]  },
+      { id: "day-69", label: "Day 69", verseRefs: ["Prov 23:16"] },
+      { id: "day-70", label: "Day 70", verseRefs: ["Prov 24:1"]  },
+      { id: "day-71", label: "Day 71", verseRefs: ["Prov 24:24"] },
+      { id: "day-72", label: "Day 72", verseRefs: ["Prov 24:25"] },
+      { id: "day-73", label: "Day 73", verseRefs: ["Prov 24:26"] },
+      { id: "day-74", label: "Day 74", verseRefs: ["Prov 24:28"] },
+      { id: "day-75", label: "Day 75", verseRefs: ["Prov 25:9"]  },
+      { id: "day-76", label: "Day 76", verseRefs: ["Prov 25:11"] },
+      { id: "day-77", label: "Day 77", verseRefs: ["Prov 25:15"] },
+      { id: "day-78", label: "Day 78", verseRefs: ["Prov 25:18"] },
+      { id: "day-79", label: "Day 79", verseRefs: ["Prov 25:23"] },
+      { id: "day-80", label: "Day 80", verseRefs: ["Prov 26:9"]  },
+      { id: "day-81", label: "Day 81", verseRefs: ["Prov 26:20"] },
+      { id: "day-82", label: "Day 82", verseRefs: ["Prov 26:22"] },
+      { id: "day-83", label: "Day 83", verseRefs: ["Prov 26:23"] },
+      { id: "day-84", label: "Day 84", verseRefs: ["Prov 26:24"] },
+      { id: "day-85", label: "Day 85", verseRefs: ["Prov 26:25"] },
+      { id: "day-86", label: "Day 86", verseRefs: ["Prov 26:28"] },
+      { id: "day-87", label: "Day 87", verseRefs: ["Prov 27:2"]  },
+      { id: "day-88", label: "Day 88", verseRefs: ["Prov 27:5"]  },
+      { id: "day-89", label: "Day 89", verseRefs: ["Prov 28:23"] },
+      { id: "day-90", label: "Day 90", verseRefs: ["Prov 29:5"]  },
+      { id: "day-91", label: "Day 91", verseRefs: ["Prov 29:11"] },
+      { id: "day-92", label: "Day 92", verseRefs: ["Prov 29:20"] },
+      { id: "day-93", label: "Day 93", verseRefs: ["Prov 31:8"]  },
+      { id: "day-94", label: "Day 94", verseRefs: ["Prov 31:9"]  },
+      { id: "day-95", label: "Day 95", verseRefs: ["Prov 31:26"] },
+    ];
+
+    // ─── HOOKS & HELPERS ─────────────────────────────────────────────────────
+
+    function useLocalStorage(key, initialValue) {
+      const [storedValue, setStoredValue] = useState(() => {
+        try {
+          const item = window.localStorage.getItem(key);
+          return item ? JSON.parse(item) : initialValue;
+        } catch { return initialValue; }
+      });
+      const setValue = (value) => {
+        try {
+          const v = value instanceof Function ? value(storedValue) : value;
+          setStoredValue(v);
+          window.localStorage.setItem(key, JSON.stringify(v));
+        } catch (err) { console.error(err); }
+      };
+      return [storedValue, setValue];
+    }
+
+    function blankNotes() {
+      return { caption: '', qa: [{ q: '', a: '' }], xrefs: [''], xrefsHtml: [null], insights: '', insightsHtml: null, application: '', applicationHtml: null, translation: 'NLT', kjvHtml: null, nltHtml: null };
+    }
+
+    function escHtml(str) {
+      const d = document.createElement('div');
+      d.appendChild(document.createTextNode(str || ''));
+      return d.innerHTML;
+    }
+
+    function EditableVerse({ label, extra, text, savedHtml, dayId, className, onChange }) {
+      const ref = useRef(null);
+
+      useEffect(() => {
+        if (ref.current) ref.current.innerHTML = savedHtml || escHtml(text);
+      }, [dayId]);
+
+      const doBold = (e) => {
+        e.preventDefault();
+        if (!ref.current) return;
+        ref.current.focus();
+        document.execCommand('bold', false, null);
+        onChange(ref.current.innerHTML);
+      };
+
+      return (
+        <>
+          <div className="verse-block-header">
+            <span className="trans-label">{label}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+              {extra}
+              <button className="verse-bold-btn" onMouseDown={doBold} title="Select text in the verse, then click B to bold it">B</button>
+            </div>
+          </div>
+          <div
+            ref={ref}
+            contentEditable
+            suppressContentEditableWarning
+            className={`verse-text${className ? ' ' + className : ''}`}
+            onInput={() => onChange(ref.current.innerHTML)}
+          />
+        </>
+      );
+    }
+
+    const VERSE_MAP = Object.fromEntries(VERSES.map(v => [v.ref, v]));
+
+    // Flat day list — each entry has everything needed to render
+    function getDefaultDayList(legacyLabels = {}) {
+      return DEFAULT_GROUPS.map(g => {
+        const v = VERSE_MAP[g.verseRefs[0]] || {};
+        return { id: g.id, label: legacyLabels[g.id] || g.label, ref: v.ref || '', theme: v.theme || '', kjv: v.kjv || '', nlt: v.nlt || '' };
+      });
+    }
+
+    // ─── WELCOME ──────────────────────────────────────────────────────────────
+
+    function Welcome({ groupLabel, onOpen }) {
+      return (
+        <div className="welcome-screen">
+          <div className="welcome-card">
+            <div className="welcome-lock">🔒</div>
+            <h1 className="welcome-title">{groupLabel}</h1>
+            <p className="welcome-text">Ready to study? Click below to open today's verse.</p>
+            <button className="welcome-btn" onClick={onOpen}>Open {groupLabel}</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── FOLDER SECTION ───────────────────────────────────────────────────────
+
+    function FolderSection({ folders, days, currentId, onSelect, onAddFolder, onDeleteFolder, onAddDay, onRemoveDay }) {
+      const groupLabels = Object.fromEntries((days||[]).map(d => [d.id, d.label]));
+      const groups = days || [];
+      const [adding, setAdding] = useState(false);
+      const [newName, setNewName] = useState('');
+      const [expanded, setExpanded] = useState({});
+      const [addingDayTo, setAddingDayTo] = useState(null);
+
+      const confirm = () => {
+        if (newName.trim()) { onAddFolder(newName.trim()); setNewName(''); setAdding(false); }
+      };
+
+      return (
+        <div className="folder-section">
+          <div className="folder-section-header">
+            <span className="folder-section-title">📁 Folders</span>
+            <button className="folder-add-btn" onClick={() => setAdding(a => !a)} title="New folder">+</button>
+          </div>
+
+          {adding && (
+            <div className="folder-new-row">
+              <input
+                autoFocus
+                className="folder-new-input"
+                placeholder="Folder name…"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') confirm(); if (e.key === 'Escape') setAdding(false); }}
+              />
+              <button className="folder-new-confirm" onClick={confirm}>✓</button>
+            </div>
+          )}
+
+          {folders.length === 0 && !adding && (
+            <div className="folder-empty">No folders yet — click + to create one</div>
+          )}
+
+          {folders.map(folder => {
+            const isExpanded = !!expanded[folder.id];
+            const folderDays = groups.filter(g => (folder.dayIds || []).includes(g.id));
+            const unassigned = groups.filter(g => !(folder.dayIds || []).includes(g.id));
+            return (
+              <div key={folder.id} className="folder-item">
+                <div className="folder-header" onClick={() => setExpanded(e => ({ ...e, [folder.id]: !e[folder.id] }))}>
+                  <span className="folder-chevron">{isExpanded ? '▾' : '▸'}</span>
+                  <span className="folder-name">{folder.name}</span>
+                  <span className="folder-count">({folderDays.length})</span>
+                  <button
+                    className="folder-delete-btn"
+                    onClick={e => { e.stopPropagation(); onDeleteFolder(folder.id); }}
+                    title="Delete folder"
+                  >✕</button>
+                </div>
+
+                {isExpanded && (
+                  <div className="folder-days">
+                    {folderDays.map(g => (
+                      <div
+                        key={g.id}
+                        className={`folder-day-row ${currentId === g.id ? 'active' : ''}`}
+                      >
+                        <span className="folder-day-name" onClick={() => onSelect(g.id)}>
+                          {groupLabels[g.id] || g.label}
+                        </span>
+                        <button className="folder-day-remove" onClick={() => onRemoveDay(folder.id, g.id)} title="Remove">✕</button>
+                      </div>
+                    ))}
+
+                    {addingDayTo === folder.id ? (
+                      <div className="folder-add-day-row">
+                        <select
+                          className="folder-day-select"
+                          defaultValue=""
+                          onChange={e => {
+                            if (e.target.value) { onAddDay(folder.id, e.target.value); setAddingDayTo(null); }
+                          }}
+                        >
+                          <option value="">Pick a day…</option>
+                          {unassigned.map(g => (
+                            <option key={g.id} value={g.id}>{groupLabels[g.id] || g.label}</option>
+                          ))}
+                        </select>
+                        <button className="folder-add-day-cancel" onClick={() => setAddingDayTo(null)}>✕</button>
+                      </div>
+                    ) : (
+                      unassigned.length > 0 && (
+                        <button className="folder-add-day-btn" onClick={() => setAddingDayTo(folder.id)}>+ Add day</button>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // ─── SIDEBAR ──────────────────────────────────────────────────────────────
+
+    const DAY_COLORS = [null,'#e57373','#f4a460','#f0c040','#66bb6a','#64b5f6','#9575cd','#f06292','#4db6ac','#a1887f'];
+
+    function ColorPicker({ current, onSelect }) {
+      return (
+        <div className="color-picker-strip">
+          {DAY_COLORS.map((c, i) => (
+            <button
+              key={i}
+              className={`color-swatch${c === null ? ' clr' : ''}${current === c ? ' selected' : ''}`}
+              style={{ background: c || undefined }}
+              title={c || 'Clear colour'}
+              onClick={() => onSelect(c)}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    function DayEditForm({ initial, onSave, onCancel }) {
+      const [d, setD] = useState({ label: '', ref: '', theme: '', kjv: '', nlt: '', ...initial });
+      const f = (k, v) => setD(prev => ({ ...prev, [k]: v }));
+      return (
+        <div className="day-edit-form">
+          <label>Label</label>
+          <input value={d.label} onChange={e => f('label', e.target.value)} placeholder="e.g. Day 12" />
+          <label>Reference</label>
+          <input value={d.ref} onChange={e => f('ref', e.target.value)} placeholder="e.g. Prov 15:1" />
+          <label>Theme</label>
+          <input value={d.theme} onChange={e => f('theme', e.target.value)} placeholder="e.g. Gentle speech" />
+          <label>KJV text</label>
+          <textarea rows={3} value={d.kjv} onChange={e => f('kjv', e.target.value)} placeholder="KJV verse text…" />
+          <label>Alt text (NLT etc.)</label>
+          <textarea rows={3} value={d.nlt} onChange={e => f('nlt', e.target.value)} placeholder="NLT or other translation…" />
+          <div className="day-edit-actions">
+            <button className="day-edit-save" onClick={() => d.kjv.trim() && onSave(d)}>Save</button>
+            <button className="day-edit-cancel" onClick={onCancel}>Cancel</button>
+          </div>
+        </div>
+      );
+    }
+
+    function Sidebar({ days, folders, onSelect, currentId, openedIds, completedIds,
+                       onAddFolder, onDeleteFolder, onAddDay, onRemoveDay,
+                       onDeleteDayEntry, onEditDayEntry, onAddNewDay, onReorderDays }) {
+      const [search, setSearch] = useState('');
+      const [manage, setManage] = useState(false);
+      const [editingId, setEditingId] = useState(null);
+      const [addingVerse, setAddingVerse] = useState(false);
+      const [dragId, setDragId] = useState(null);
+      const [dragOverId, setDragOverId] = useState(null);
+      const [colorPickerId, setColorPickerId] = useState(null);
+
+      const filtered = days.filter(d =>
+        d.label.toLowerCase().includes(search.toLowerCase()) ||
+        d.ref.toLowerCase().includes(search.toLowerCase())
+      );
+      const total = days.length;
+      const completed = completedIds.size;
+
+      return (
+        <aside className="sidebar">
+          <div className="sidebar-header">
+            <div className="sidebar-header-row">
+              <div>
+                <div className="sidebar-title">Proverbs on Speech</div>
+                <div className="sidebar-sub">{total} days · {completed} completed</div>
+              </div>
+              <button className={`manage-toggle ${manage ? 'active' : ''}`} onClick={() => { setManage(m => !m); setEditingId(null); setAddingVerse(false); }}>
+                {manage ? 'Done' : 'Manage'}
+              </button>
+            </div>
+          </div>
+
+          <div className="sidebar-search">
+            <input type="text" placeholder="Search days…" value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
+
+          <ul className="day-list" role="list">
+            {filtered.map(day => {
+              const isOpen = openedIds.has(day.id);
+              const isDone = completedIds.has(day.id);
+              const isActive = currentId === day.id;
+              const isEditing = editingId === day.id;
+              return (
+                <React.Fragment key={day.id}>
+                  <li
+                    className={`day-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''} ${dragId === day.id ? 'dragging' : ''} ${dragOverId === day.id && dragId !== day.id ? 'drag-over' : ''}`}
+                    draggable
+                    onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; setDragId(day.id); }}
+                    onDragEnd={() => { setDragId(null); setDragOverId(null); }}
+                    onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverId(day.id); }}
+                    onDragLeave={() => setDragOverId(null)}
+                    onDrop={e => { e.preventDefault(); if (dragId && dragId !== day.id) onReorderDays(dragId, day.id); setDragId(null); setDragOverId(null); }}
+                    onClick={() => !manage && onSelect(day.id)}
+                    role="button" tabIndex={0}
+                    onKeyDown={e => e.key === 'Enter' && !manage && onSelect(day.id)}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {day.color && <span className="day-color-dot" style={{ background: day.color }} />}
+                    <div className="day-label" onClick={() => manage && onSelect(day.id)} style={manage ? { cursor: 'pointer' } : {}}>{day.label}</div>
+                    {manage ? (
+                      <div className="day-item-actions">
+                        <button
+                          className="color-swatch-btn"
+                          style={{ background: day.color || '#e5e3da' }}
+                          title="Set colour"
+                          onClick={e => { e.stopPropagation(); setColorPickerId(colorPickerId === day.id ? null : day.id); setEditingId(null); }}
+                        />
+                        <button className="day-action-btn" title="Edit verse" onClick={() => { setEditingId(isEditing ? null : day.id); setColorPickerId(null); }}>✏</button>
+                        <button className="day-action-btn del" title="Remove" onClick={() => { onDeleteDayEntry(day.id); setEditingId(null); setColorPickerId(null); }}>×</button>
+                      </div>
+                    ) : (
+                      <div className="day-meta">
+                        {isDone && <span className="badge badge-done">✓</span>}
+                        {!isOpen && !isDone && <span className="badge badge-lock">🔒</span>}
+                        {isOpen && !isDone && <span className="badge badge-open">•</span>}
+                      </div>
+                    )}
+                  </li>
+                  {colorPickerId === day.id && manage && (
+                    <li style={{ listStyle: 'none' }}>
+                      <ColorPicker
+                        current={day.color || null}
+                        onSelect={c => { onEditDayEntry(day.id, { color: c }); setColorPickerId(null); }}
+                      />
+                    </li>
+                  )}
+                  {isEditing && (
+                    <DayEditForm
+                      initial={day}
+                      onSave={updates => { onEditDayEntry(day.id, updates); setEditingId(null); }}
+                      onCancel={() => setEditingId(null)}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+            {manage && !addingVerse && (
+              <li style={{ listStyle: 'none' }}>
+                <button className="add-verse-btn" onClick={() => setAddingVerse(true)}>+ Add verse</button>
+              </li>
+            )}
+            {manage && addingVerse && (
+              <li style={{ listStyle: 'none' }}>
+                <div className="add-verse-form">
+                  <DayEditForm
+                    initial={{ label: `Day ${days.length + 1}`, ref: '', theme: '', kjv: '', nlt: '' }}
+                    onSave={data => { onAddNewDay(data); setAddingVerse(false); }}
+                    onCancel={() => setAddingVerse(false)}
+                  />
+                </div>
+              </li>
+            )}
+          </ul>
+
+          <div className="sidebar-progress">
+            <div className="prog-label">{completed} / {total} complete</div>
+            <div className="prog-track">
+              <div className="prog-fill" style={{ width: `${total ? (completed / total) * 100 : 0}%` }} />
+            </div>
+          </div>
+
+          <FolderSection
+            folders={folders}
+            days={days}
+            currentId={currentId}
+            onSelect={onSelect}
+            onAddFolder={onAddFolder}
+            onDeleteFolder={onDeleteFolder}
+            onAddDay={onAddDay}
+            onRemoveDay={onRemoveDay}
+          />
+        </aside>
+      );
+    }
+
+    function BoldField({ savedHtml, fallbackText, dayId, placeholder, className, onChange }) {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (ref.current) ref.current.innerHTML = savedHtml || escHtml(fallbackText || '');
+      }, [dayId]);
+      const doBold = (e) => {
+        e.preventDefault();
+        if (!ref.current) return;
+        ref.current.focus();
+        document.execCommand('bold', false, null);
+        onChange(ref.current.innerHTML);
+      };
+      return (
+        <div className="bold-field-wrap">
+          <div
+            ref={ref}
+            contentEditable
+            suppressContentEditableWarning
+            className={`field-editable${className ? ' ' + className : ''}`}
+            data-placeholder={placeholder}
+            onInput={() => onChange(ref.current.innerHTML)}
+          />
+          <button className="field-bold-btn" onMouseDown={doBold} title="Select text then click B to bold">B</button>
+        </div>
+      );
+    }
+
+    // ─── STUDY PAGE ───────────────────────────────────────────────────────────
+
+    function StudyPage({ day, notes, onSave, onLabelSave, onNext, onPrev, hasNext, hasPrev }) {
+      const groupLabel = day.label;
+      const [form, setForm] = useState(notes);
+      const [editingLabel, setEditingLabel] = useState(false);
+      const [labelDraft, setLabelDraft] = useState(groupLabel);
+      const [savedFlash, setSavedFlash] = useState(false);
+
+      useEffect(() => {
+        setForm(notes);
+        setLabelDraft(day.label);
+        setEditingLabel(false);
+      }, [day.id, notes]);
+
+      const update = (field, value) => setForm(f => ({ ...f, [field]: value }));
+      const updateQA = (i, key, val) => update('qa', form.qa.map((p, idx) => idx === i ? { ...p, [key]: val } : p));
+      const addQA = () => update('qa', [...form.qa, { q: '', a: '' }]);
+      const removeQA = (i) => update('qa', form.qa.filter((_, idx) => idx !== i));
+      const updateXref = (i, html) => setForm(f => {
+        const d = document.createElement('div'); d.innerHTML = html;
+        const text = d.textContent || '';
+        const xrefs = f.xrefs.map((x, idx) => idx === i ? text : x);
+        const xrefsHtml = [...(f.xrefsHtml || f.xrefs.map(() => null))];
+        while (xrefsHtml.length <= i) xrefsHtml.push(null);
+        xrefsHtml[i] = html;
+        return { ...f, xrefs, xrefsHtml };
+      });
+      const addXref = () => setForm(f => ({ ...f, xrefs: [...f.xrefs, ''], xrefsHtml: [...(f.xrefsHtml || []), null] }));
+      const removeXref = (i) => setForm(f => ({ ...f, xrefs: f.xrefs.filter((_, idx) => idx !== i), xrefsHtml: (f.xrefsHtml || []).filter((_, idx) => idx !== i) }));
+
+      const handleSave = () => {
+        onSave(form);
+        setSavedFlash(true);
+        setTimeout(() => setSavedFlash(false), 2000);
+      };
+      const handleLabelSave = () => { onLabelSave(labelDraft); setEditingLabel(false); };
+
+      return (
+        <div className="study-page">
+          <div className="topbar">
+          <div className="topbar-inner">
+            <div className="topbar-left">
+              {editingLabel ? (
+                <div className="label-edit">
+                  <input
+                    autoFocus
+                    value={labelDraft}
+                    onChange={e => setLabelDraft(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleLabelSave(); if (e.key === 'Escape') setEditingLabel(false); }}
+                    className="label-input"
+                  />
+                  <button className="label-save-btn" onClick={handleLabelSave}>Save</button>
+                  <button className="label-cancel-btn" onClick={() => setEditingLabel(false)}>Cancel</button>
+                </div>
+              ) : (
+                <div className="day-heading" onClick={() => setEditingLabel(true)} title="Click to rename">
+                  <span>{groupLabel}</span>
+                  <span className="edit-hint">rename</span>
+                </div>
+              )}
+              <div className="verse-refs-row">
+                {day.ref && <span className="verse-ref-chip">{day.ref}</span>}
+                {day.theme && <span className="theme-chip">{day.theme}</span>}
+              </div>
+            </div>
+            <div className="topbar-nav">
+              <button className="nav-btn" onClick={onPrev} disabled={!hasPrev}>← Prev</button>
+              <button className="nav-btn" onClick={onNext} disabled={!hasNext}>Next →</button>
+            </div>
+          </div>
+          </div>
+
+          <div className="study-body">
+            <div className="study-content">
+
+              <div className="verse-section">
+                <div className="verse-block kjv-block">
+                  <EditableVerse
+                    label={`KJV — ${day.ref}`}
+                    text={`"${day.kjv}"`}
+                    savedHtml={form.kjvHtml}
+                    dayId={day.id}
+                    onChange={html => update('kjvHtml', html)}
+                  />
+                </div>
+                <div className="verse-block alt-block">
+                  <EditableVerse
+                    label="Translation"
+                    extra={
+                      <select className="trans-select" value={form.translation} onChange={e => update('translation', e.target.value)}>
+                        {TRANSLATIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    }
+                    className="alt-text"
+                    text={form.translation === 'NLT'
+                      ? `"${day.nlt}"`
+                      : `"${day.nlt}" (NLT shown — add your ${form.translation} text here)`}
+                    savedHtml={form.nltHtml}
+                    dayId={day.id}
+                    onChange={html => update('nltHtml', html)}
+                  />
+                </div>
+              </div>
+
+              <div className="divider" />
+
+              <section className="field-section caption-section">
+                <label className="field-label"><span className="field-num">1</span> Caption</label>
+                <textarea
+                  className="field-textarea"
+                  rows={2}
+                  placeholder="A short title or caption for this passage…"
+                  value={form.caption}
+                  onChange={e => update('caption', e.target.value)}
+                />
+              </section>
+
+              <section className="field-section">
+                <label className="field-label"><span className="field-num">2</span> Questions &amp; Answers</label>
+                {form.qa.map((pair, i) => (
+                  <div key={i} className="qa-pair">
+                    <div className="qa-col">
+                      <div className="qa-sub-label">Q</div>
+                      <textarea className="field-textarea qa-ta" rows={2} placeholder="Question…" value={pair.q} onChange={e => updateQA(i, 'q', e.target.value)} />
+                    </div>
+                    <div className="qa-col">
+                      <div className="qa-sub-label">A</div>
+                      <textarea className="field-textarea qa-ta" rows={2} placeholder="Answer…" value={pair.a} onChange={e => updateQA(i, 'a', e.target.value)} />
+                    </div>
+                    {form.qa.length > 1 && <button className="remove-btn" onClick={() => removeQA(i)} title="Remove">✕</button>}
+                  </div>
+                ))}
+                <button className="add-btn" onClick={addQA}>+ Add question</button>
+              </section>
+
+              <section className="field-section">
+                <label className="field-label"><span className="field-num">3</span> Cross References</label>
+                {form.xrefs.map((xr, i) => (
+                  <div key={i} className="xref-row">
+                    <BoldField
+                      savedHtml={(form.xrefsHtml || [])[i]}
+                      fallbackText={xr}
+                      dayId={day.id + '-xref-' + i}
+                      placeholder="e.g. James 3:5 — Death and life are in the power of the tongue…"
+                      className="xref-editable"
+                      onChange={html => updateXref(i, html)}
+                    />
+                    {form.xrefs.length > 1 && <button className="remove-btn small" style={{marginTop:'6px'}} onClick={() => removeXref(i)} title="Remove">✕</button>}
+                  </div>
+                ))}
+                <button className="add-btn" onClick={addXref}>+ Add cross reference</button>
+              </section>
+
+              <section className="field-section">
+                <label className="field-label"><span className="field-num">4</span> Insights</label>
+                <BoldField
+                  savedHtml={form.insightsHtml}
+                  fallbackText={form.insights}
+                  dayId={day.id + '-insights'}
+                  placeholder="Key themes, observations, Hebrew word meanings, context…"
+                  onChange={html => { const d = document.createElement('div'); d.innerHTML = html; setForm(f => ({ ...f, insightsHtml: html, insights: d.textContent || '' })); }}
+                />
+              </section>
+
+              <section className="field-section">
+                <label className="field-label"><span className="field-num">5</span> Application</label>
+                <BoldField
+                  savedHtml={form.applicationHtml}
+                  fallbackText={form.application}
+                  dayId={day.id + '-application'}
+                  placeholder="How does this verse apply to your life today?…"
+                  onChange={html => { const d = document.createElement('div'); d.innerHTML = html; setForm(f => ({ ...f, applicationHtml: html, application: d.textContent || '' })); }}
+                />
+              </section>
+
+              <div className="save-row">
+                <button className="save-btn" onClick={handleSave}>
+                  {savedFlash ? '✓ Saved!' : 'Save notes'}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── APP ──────────────────────────────────────────────────────────────────
+
+    function App() {
+      const [savedDayList, setSavedDayList] = useLocalStorage('pss-daylist', null);
+      const [legacyLabels]                  = useLocalStorage('pss-labels', {});
+      const [openedIds, setOpenedIds]       = useLocalStorage('pss-opened', []);
+      const [allNotes, setAllNotes]         = useLocalStorage('pss-notes', {});
+      const [folders, setFolders]           = useLocalStorage('pss-folders', []);
+
+      const [dayList, setDayListState] = useState(() => savedDayList || getDefaultDayList(legacyLabels));
+      const setDayList = (list) => { setDayListState(list); setSavedDayList(list); };
+
+      const [currentId, setCurrentId] = useState(() => (savedDayList || getDefaultDayList(legacyLabels))[0]?.id);
+
+      const openedSet = new Set(openedIds);
+
+      const completedIds = new Set(
+        dayList.filter(d => {
+          const n = allNotes[d.id];
+          if (!n) return false;
+          return n.caption || n.insights || n.application ||
+            (n.qa || []).some(x => x.q || x.a) ||
+            (n.xrefs || []).some(x => x);
+        }).map(d => d.id)
+      );
+
+      const currentIdx = dayList.findIndex(d => d.id === currentId);
+      const currentDay = dayList[currentIdx] || dayList[0];
+
+      const handleSelect   = useCallback((id) => setCurrentId(id), []);
+      const handleOpen     = useCallback(() => {
+        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet, setOpenedIds]);
+      const handleSave     = useCallback((notes) => {
+        setAllNotes(prev => ({ ...prev, [currentId]: notes }));
+        if (!openedSet.has(currentId)) setOpenedIds([...openedIds, currentId]);
+      }, [currentId, openedIds, openedSet, setAllNotes, setOpenedIds]);
+      const handleLabelSave = useCallback((label) => {
+        setDayList(dayList.map(d => d.id === currentId ? { ...d, label } : d));
+      }, [currentId, dayList]);
+
+      const handlePrev = () => { if (currentIdx > 0) setCurrentId(dayList[currentIdx - 1].id); };
+      const handleNext = () => { if (currentIdx < dayList.length - 1) setCurrentId(dayList[currentIdx + 1].id); };
+
+      // Day CRUD
+      const handleDeleteDayEntry = (id) => {
+        const next = dayList.filter(d => d.id !== id);
+        setDayList(next);
+        if (id === currentId) setCurrentId(next[0]?.id);
+      };
+      const handleEditDayEntry  = (id, updates) => setDayList(dayList.map(d => d.id === id ? { ...d, ...updates } : d));
+      const handleReorderDays   = (fromId, toId) => {
+        const from = dayList.findIndex(d => d.id === fromId);
+        const to   = dayList.findIndex(d => d.id === toId);
+        if (from === -1 || to === -1 || from === to) return;
+        const next = [...dayList];
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved);
+        setDayList(next);
+      };
+      const handleAddNewDay    = (data) => {
+        const newDay = { ...data, id: 'c-' + Date.now() };
+        setDayList([...dayList, newDay]);
+      };
+
+      // Folder CRUD
+      const handleAddFolder    = (name) => setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, dayIds: [] }]);
+      const handleDeleteFolder = (fid)  => setFolders(prev => prev.filter(f => f.id !== fid));
+      const handleAddDay       = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: [...(f.dayIds||[]).filter(d=>d!==dayId), dayId] } : f));
+      const handleRemoveDay    = (fid, dayId) => setFolders(prev => prev.map(f => f.id === fid ? { ...f, dayIds: (f.dayIds||[]).filter(d=>d!==dayId) } : f));
+
+      const notes  = allNotes[currentId] || blankNotes();
+      const isOpen = openedSet.has(currentId);
+
+      return (
+        <div className="app-shell">
+          <Sidebar
+            days={dayList}
+            folders={folders}
+            onSelect={handleSelect}
+            currentId={currentId}
+            openedIds={openedSet}
+            completedIds={completedIds}
+            onAddFolder={handleAddFolder}
+            onDeleteFolder={handleDeleteFolder}
+            onAddDay={handleAddDay}
+            onRemoveDay={handleRemoveDay}
+            onDeleteDayEntry={handleDeleteDayEntry}
+            onEditDayEntry={handleEditDayEntry}
+            onAddNewDay={handleAddNewDay}
+            onReorderDays={handleReorderDays}
+          />
+          <main className="app-main">
+            {isOpen ? (
+              <StudyPage
+                day={currentDay}
+                notes={notes}
+                onSave={handleSave}
+                onLabelSave={handleLabelSave}
+                onNext={handleNext}
+                onPrev={handlePrev}
+                hasNext={currentIdx < dayList.length - 1}
+                hasPrev={currentIdx > 0}
+              />
+            ) : (
+              <Welcome groupLabel={currentDay?.label || ''} onOpen={handleOpen} />
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    // ─── MOUNT ────────────────────────────────────────────────────────────────
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
